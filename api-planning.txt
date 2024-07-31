@@ -50,6 +50,29 @@ req:
 
 GROUP: cashflow
 
-[1] - Create wallets
-[2] - Get wallets
-...
+[1] - Create Transactions
+[POST] : {root.api}/{version}/{transaction}
+
+req:
+{
+    "userId": 1,
+    "trxDate": "2024-07-02T04:15:51.000Z",
+    "bankFrom": "BCA",
+    "trxType": "SPENDING",
+    "trxName": "MAKAN",
+    "trxVia": "QR",
+    "trxAmount": "120500",
+    "trxNote": "BK - Cideng",
+    "trxColor": "#C58305"
+}
+
+res:
+{
+    "message": "Create Transaction Success",
+    "data": {
+        "id": 12,
+        "trxName": "MAKAN",
+        "trxAmount": "120500",
+        "trxDate": "2024-07-02T04:15:51.000Z"
+    } 
+}

@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 
 const app = express();
 const walletsRoutes = require('./src/routes/wallets');
+const transactionsRoutes = require('./src/routes/transactions');
 
 app.use(bodyParser.json());
 // Body Parser merupakan library yang berisi middleware untuk membaca sebuah data yang dikirimkan oleh HTTP POST 
@@ -16,6 +17,7 @@ app.use((req, res, next) => {
     next();
 })
 
-app.use('/', walletsRoutes);
+app.use('/v1', walletsRoutes);
+app.use('/v1', transactionsRoutes);
 
 app.listen(4000);
