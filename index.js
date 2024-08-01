@@ -20,4 +20,12 @@ app.use((req, res, next) => {
 app.use('/v1', walletsRoutes);
 app.use('/v1', transactionsRoutes);
 
+app.use((error, req, res, next) => {
+    const status = error.errorStatus || 500;
+    const message = error.message;
+    const data = error.data;
+
+    res.status(status).json({message: message, data: data})
+})
+
 app.listen(4000);

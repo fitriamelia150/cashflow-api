@@ -9,10 +9,10 @@ exports.createTransaction = (req, res, next) => {
     console.log(errors);
 
     if(!errors.isEmpty()){
-        res.status(400).json({
-            message: 'Request Error',
-            data: null
-        })
+        const err = new Error('Input Validation Error');
+        err.errorStatus = 400;
+        err.data = errors.array();
+        throw err;
     }
 
     const result = {
