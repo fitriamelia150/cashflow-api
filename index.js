@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
 const app = express();
 const walletsRoutes = require('./src/routes/wallets');
@@ -28,4 +29,8 @@ app.use((error, req, res, next) => {
     res.status(status).json({message: message, data: data})
 })
 
-app.listen(4000);
+mongoose.connect('mongodb+srv://fitriamelia000111:PopFWdCZFQVF790g@cluster0.ypld6dd.mongodb.net/cashflow-app?retryWrites=true&w=majority&appName=Cluster0')
+.then(() => {
+    app.listen(4000, () => console.log('connected to db'));
+})
+.catch(err => console.log(err))
