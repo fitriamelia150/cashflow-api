@@ -3,11 +3,9 @@ const Transaction = require('../models/transactions');
 
 exports.createTransaction = (req, res, next) => {
 
-    const { userId, trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
+    const { userId, userName, trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
 
     const errors = validationResult(req);
-
-    console.log(errors);
 
     if(!errors.isEmpty()){
         const err = new Error('Input Validation Error');
@@ -24,6 +22,10 @@ exports.createTransaction = (req, res, next) => {
         trxType: trxType,
         trxNote: trxNote,
         bankFrom: bankFrom,
+        author: {
+            id: userId,
+            name: userName
+        }
     });
 
     transaction.save()
@@ -41,7 +43,14 @@ exports.createTransaction = (req, res, next) => {
 }
 
 exports.getAllTransactions = (req, res, next) => {
-    Transaction.find()
+    const user_id = req.query.userId;
+    
+    Transaction.find(
+        { $and: [
+                    {"author.id" : user_id}
+                ]
+        }
+    )
     .then(result => {
         res.status(200).json({
             message: 'Get All Transactions Success',
@@ -54,9 +63,20 @@ exports.getAllTransactions = (req, res, next) => {
 }
 
 exports.getTransactionById = (req, res, next) => {
-    const id = req.params.id;
-    Transaction.findById(id)
+    const id = req.query.id;
+    const user_id = req.query.userId;
+
+    Transaction.findOne(
+        { $and: [
+                    {"author.id" : user_id},
+                    {"_id" : id}
+                ]
+        }
+    )
     .then(result => {
+
+        console.log(result);
+
         if(!result){
             const error = new Error('Transaction not found');
             error.errorStatus = 404;
@@ -73,7 +93,7 @@ exports.getTransactionById = (req, res, next) => {
 }
 
 exports.updateTransaction = (req, res, next) => {
-    const { userId, trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
+    const { trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
 
     const errors = validationResult(req);
 
@@ -84,8 +104,20 @@ exports.updateTransaction = (req, res, next) => {
         throw err;
     }
 
-    Transaction.findById(req.params.id)
+    const id = req.query.id;
+    const user_id = req.query.userId;
+
+    Transaction.findOne(
+        { $and: [
+                    {"author.id" : user_id},
+                    {"_id" : id}
+                ]
+        }
+    )
     .then(trx => {
+
+        console.log(trx);
+
         if(!trx){
             const err = new Error('Transaction not found');
             err.errorStatus = 404;
@@ -114,9 +146,16 @@ exports.updateTransaction = (req, res, next) => {
 }
 
 exports.deleteTransaction = (req, res, next) => {
-    const id = req.params.id;
+    const id = req.query.id;
+    const user_id = req.query.userId;
 
-    Transaction.findById(id)
+    Transaction.findOne(
+        { $and: [
+                    {"author.id" : user_id},
+                    {"_id" : id}
+                ]
+        }
+    )
     .then(trx => {
         if(!trx){
             const err = new Error('Transaction not found');

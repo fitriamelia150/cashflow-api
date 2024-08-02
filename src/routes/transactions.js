@@ -11,15 +11,15 @@ router.post('/transaction', [
     transactionsController.createTransaction);
 
 //read => GET
-router.get('/transactions', transactionsController.getAllTransactions);
-router.get('/transaction/:id', transactionsController.getTransactionById);
+router.get('/transactions?', transactionsController.getAllTransactions);
+router.get('/transaction?', transactionsController.getTransactionById);
 
 //update => PUT
-router.put('/transaction/:id', [
+router.put('/transaction?', [
         body('trxNote').isLength({min: 5}).withMessage('Note must be at least 5 characters')],
         transactionsController.updateTransaction);
 
 //delete => DELETE
-router.delete('/transaction/:id', transactionsController.deleteTransaction);
+router.delete('/transaction?', transactionsController.deleteTransaction);
 
 module.exports = router;
