@@ -36,3 +36,5 @@ mongoose.connect('mongodb+srv://fitriamelia000111:PopFWdCZFQVF790g@cluster0.ypld
     app.listen(4000, () => console.log('connected to db'));
 })
 .catch(err => console.log(err))
+
+module.exports = app;
