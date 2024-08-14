@@ -14,7 +14,7 @@ const walletSchema = new Schema({
         type: String,
         required: true
     },
-    author: {
+    user: {
         id: {
             type: String,
             required: true

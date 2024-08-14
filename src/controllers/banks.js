@@ -1,9 +1,9 @@
 const {validationResult} = require('express-validator');
-const Transaction = require('../models/transactions');
+const Bank = require('../models/banks');
 
-exports.createTransaction = (req, res, next) => {
+exports.createBank = (req, res, next) => {
 
-    const { userId, userName, trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
+    const { userId, userName, bankName, bankBalance } = req.body;
 
     const errors = validationResult(req);
 
@@ -14,46 +14,35 @@ exports.createTransaction = (req, res, next) => {
         throw err;
     }
 
-    const transaction = new Transaction({
-        trxName: trxName,
-        trxDate: trxDate,
-        trxAmount: trxAmount,
-        trxVia: trxVia,
-        trxType: trxType,
-        trxNote: trxNote,
-        bankFrom: bankFrom,
+    const bank = new Bank({
+        bankName: bankName,
+        bankBalance: bankBalance,
         user: {
             id: userId,
             name: userName
         }
     });
 
-    transaction.save()
+    bank.save()
     .then(result => {
         res.status(201).json({
-            message: 'Create Transaction Success',
+            message: 'Create Bank Success',
             data: result
         });
     })
-    .catch( err => {
+    .catch(err => {
         console.log(err);
         next(err);
-    });
-    
+    })
 }
 
-exports.getAllTransactions = (req, res, next) => {
+exports.getAllBanks = (req, res, next) => {
     const user_id = req.query.userId;
-    
-    Transaction.find(
-        { $and: [
-                    {"user.id" : user_id}
-                ]
-        }
-    )
+
+    Bank.find({"user.id": user_id})
     .then(result => {
         res.status(200).json({
-            message: 'Get All Transactions Success',
+            message: 'Get All Banks Success',
             data: result
         })
     })
@@ -62,11 +51,11 @@ exports.getAllTransactions = (req, res, next) => {
     })
 }
 
-exports.getTransactionById = (req, res, next) => {
+exports.getBankById = (req, res, next) => {
     const id = req.query.id;
     const user_id = req.query.userId;
 
-    Transaction.findOne(
+    Bank.findOne(
         { $and: [
                     {"user.id" : user_id},
                     {"_id" : id}
@@ -74,14 +63,13 @@ exports.getTransactionById = (req, res, next) => {
         }
     )
     .then(result => {
-
         if(result === null){
-            const error = new Error('Transaction not found');
+            const error = new Error('Bank not found');
             error.errorStatus = 404;
             throw error;
         }
         res.status(200).json({
-            message: 'Get Transaction Success',
+            message: 'Get Bank Success',
             data: result
         })
     })
@@ -90,8 +78,8 @@ exports.getTransactionById = (req, res, next) => {
     })
 }
 
-exports.updateTransaction = (req, res, next) => {
-    const { trxDate, bankFrom, trxType, trxName, trxVia, trxAmount, trxNote, trxColor } = req.body;
+exports.updateBank = (req, res, next) => {
+    const { userId, userName, bankName, bankBalance } = req.body;
 
     const errors = validationResult(req);
 
@@ -105,69 +93,78 @@ exports.updateTransaction = (req, res, next) => {
     const id = req.query.id;
     const user_id = req.query.userId;
 
-    Transaction.findOne(
+    Bank.findOne(
         { $and: [
                     {"user.id" : user_id},
                     {"_id" : id}
                 ]
         }
     )
-    .then(trx => {
-
-        if(trx === null){
-            const err = new Error('Transaction not found');
-            err.errorStatus = 404;
-            throw err;
+    .then(bank => {
+        
+        if(bank === null){
+            const error = new Error('Bank not found');
+            error.errorStatus = 404;
+            throw error;
         }
 
-        trx.trxName = trxName;
-        trx.trxDate = trxDate;
-        trx.trxAmount = trxAmount;
-        trx.trxVia = trxVia;
-        trx.trxType = trxType;
-        trx.trxNote = trxNote;
-        trx.bankFrom = bankFrom;
+        bank.bankName = bankName;
+        bank.bankBalance = bankBalance;
 
-        return trx.save();
+        return bank.save();
     })
     .then(result => {
         res.status(200).json({
-            message: 'Update Transaction Success',
+            message: 'Update Bank Success',
             data: result
         })
     })
     .catch(err => {
+
+        if(err.message.includes('Cast to ObjectId failed')){
+            err.message = 'Bank not found or Invalid ID';
+            err.errorStatus = 404;
+        }
+
         next(err);
     })
 }
 
-exports.deleteTransaction = (req, res, next) => {
+exports.deleteBank = (req, res, next) => {
     const id = req.query.id;
     const user_id = req.query.userId;
 
-    Transaction.findOne(
-        { $and: [
+    Bank.findOne(
+        { $and:[   
                     {"user.id" : user_id},
                     {"_id" : id}
                 ]
-        }
+        }    
     )
-    .then(trx => {
-        if(trx === null){
-            const err = new Error('Transaction not found');
-            err.errorStatus = 404;
-            throw err;
+    .then(bank => {
+        console.log(bank);
+
+        if(bank === null) {
+            const error = new Error('Bank not found');
+            error.errorStatus = 404;
+            throw error;
         }
 
-        return Transaction.findByIdAndDelete(id);
+        return Bank.findByIdAndDelete(id);
     })
     .then(result => {
         res.status(200).json({
-            message: 'Delete Transaction Success',
+            message: 'Delete Bank Success',
             data: {}
         })
     })
     .catch(err => {
+        if(err.message.includes('Cast to ObjectId failed')){
+            err.message = 'Bank not found or Invalid ID';
+            err.errorStatus = 404;
+        }
+
         next(err);
     })
+
 }

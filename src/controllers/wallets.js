@@ -1,15 +1,25 @@
+const {validationResult} = require('express-validator');
 const Wallet = require('../models/wallets');
 
 exports.createWallet = (req, res, next) => {
-    const {walletName, balance, color, author} = req.body;
+    const {walletName, balance, color, user} = req.body;
+
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        const err = new Error('Input Validation Error');
+        err.errorStatus = 400;
+        err.data = errors.array();
+        throw err;
+    }
 
     const wallet = new Wallet({
         walletName: walletName,
         balance: balance,
         color: color,
-        author: {
-            id: author.id,
-            name: author.name
+        user: {
+            id: user.id,
+            name: user.name
         }
     });
 
@@ -29,7 +39,7 @@ exports.getAllWallets = (req, res, next) => {
 
     const user_id = req.query.userId;
     
-    Wallet.find({ "author.id" : user_id })
+    Wallet.find({ "user.id" : user_id })
     .then(result => {
 
         res.status(200).json({
@@ -50,12 +60,19 @@ exports.getWalletById = (req, res, next) => {
     Wallet.findOne(
         {
             $and: [
-                {"author.id" : user_id},
+                {"user.id" : user_id},
                 {"_id" : id}
             ]
         }
     )
     .then(result => {
+
+        if(result === null) {
+            const error = new Error('Wallets not found');
+            error.errorStatus = 404;
+            throw error;
+        }
+
         res.status(200).json({
             message: 'Get Wallet Success',
             data: result
@@ -72,9 +89,18 @@ exports.updateWallet = (req, res, next) => {
 
     const {walletName, balance, color} = req.body;
 
+    const errors = validationResult(req);
+
+    if(!errors.isEmpty()){
+        const err = new Error('Input Validation Error');
+        err.errorStatus = 400;
+        err.data = errors.array();
+        throw err;
+    }
+
     Wallet.updateOne(
         { $and: [
-                    {"author.id" : user_id},
+                    {"user.id" : user_id},
                     {"_id" : id}
                 ]
         },
@@ -102,12 +128,18 @@ exports.deleteWallet = (req, res, next) => {
     Wallet.deleteOne(
         {
             $and: [
-                {"author.id" : user_id},
+                {"user.id" : user_id},
                 {"_id" : id}
             ]
         }
     )
     .then(result => {
+        if(result === null) {
+            const error = new Error('Wallets not found');
+            error.errorStatus = 404;
+            throw error;
+        }
+
         res.status(200).json({
             message: 'Delete Wallet Success',
             data: result

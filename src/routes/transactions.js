@@ -11,7 +11,7 @@ router.post('/transaction', [
     transactionsController.createTransaction);
 
 //read => GET
-router.get('/transactions?', transactionsController.getAllTransactions);
+router.get('/transactions', transactionsController.getAllTransactions);
 router.get('/transaction?', transactionsController.getTransactionById);
 
 //update => PUT

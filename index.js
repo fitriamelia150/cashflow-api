@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const app = express();
 const walletsRoutes = require('./src/routes/wallets');
 const transactionsRoutes = require('./src/routes/transactions');
+const banksRoutes = require('./src/routes/banks');
 
 app.use(bodyParser.json());
 // Body Parser merupakan library yang berisi middleware untuk membaca sebuah data yang dikirimkan oleh HTTP POST 
@@ -20,6 +21,7 @@ app.use((req, res, next) => {
 
 app.use('/v1', walletsRoutes);
 app.use('/v1', transactionsRoutes);
+app.use('/v1', banksRoutes);
 
 app.use((error, req, res, next) => {
     const status = error.errorStatus || 500;
