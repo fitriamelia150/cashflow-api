@@ -13,7 +13,7 @@ router.post('/wallet',
     walletsController.createWallet);
 
 //read => GET
-router.get('/wallet-all?', walletsController.getAllWallets);
+router.get('/wallets', walletsController.getAllWallets);
 router.get('/wallet?', walletsController.getWalletById);
 
 //update => PUT
