@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index-vercel.js"
+    "start": "node api/index.js",
+    "vercel-build": "node build.js"
   },
   "author": "Fitri Amelia",
   "license": "ISC",
